@@ -24,7 +24,7 @@ RUN chmod 755 /u01 \
     && useradd -b /u01 -M -s /bin/bash oracle \
     && echo oracle:oracle | chpasswd \
     && chown oracle:oracle -R /u01 \
-    && su -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -invPtrLoc /u01/oraInst.loc -jreLoc $JAVA_HOME -ignoreSysPrereqs -force -novalidation ORACLE_HOME=$ORACLE_HOME" - oracle \
+    && su - oracle -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -invPtrLoc /u01/oraInst.loc -jreLoc $JAVA_HOME -ignoreSysPrereqs -silent ORACLE_HOME=$ORACLE_HOME" \
     && rm /u01/$FMW_JAR /u01/$FMW_PKG /u01/oraInst.loc /u01/install.file \
     && chmod +rx $SCRIPT_FILE
 
