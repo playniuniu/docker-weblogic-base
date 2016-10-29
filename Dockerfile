@@ -17,16 +17,16 @@ ENV FMW_PKG=fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip \
 COPY config/install.file config/oraInst.loc /u01/
 COPY container-scripts/createAndStartEmptyDomain.sh container-scripts/create-wls-domain.py /u01/oracle/
 
-RUN chmod a+xr /u01 \
-    && curl -jk#SLH "Cookie: oraclelicense=accept-securebackup-cookie" -o /u01/${FMW_PKG} ${ORACLE_WEBLOGIC12_URL} \
-    && chmod +xr $SCRIPT_FILE \
+RUN chmod 755 /u01 \
+    && cd /u01 \
+    && curl -jk#SLH "Cookie: oraclelicense=accept-securebackup-cookie" ${ORACLE_WEBLOGIC12_URL} -O \
+    && $JAVA_HOME/bin/jar xf $FMW_PKG \
     && useradd -b /u01 -M -s /bin/bash oracle \
-    && chown oracle:oracle -R /u01 \
     && echo oracle:oracle | chpasswd \
-    && cd /u01 && $JAVA_HOME/bin/jar xf /u01/$FMW_PKG \
-    && cd - \
+    && chown oracle:oracle -R /u01 \
     && su -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -invPtrLoc /u01/oraInst.loc -jreLoc $JAVA_HOME -ignoreSysPrereqs -force -novalidation ORACLE_HOME=$ORACLE_HOME" - oracle \
-    && rm /u01/$FMW_JAR /u01/$FMW_PKG /u01/oraInst.loc /u01/install.file
+    && rm /u01/$FMW_JAR /u01/$FMW_PKG /u01/oraInst.loc /u01/install.file \
+    && chmod +rx $SCRIPT_FILE
 
 WORKDIR ${ORACLE_HOME} 
 
