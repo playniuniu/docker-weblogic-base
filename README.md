@@ -1,7 +1,7 @@
-# Docker for Oracle Weblogic without domain
+# Oracle Weblogic with empty domain
 
 ### Description
 
-Current weblogic version is 12.2.1.2
+This docker image use Weblogic 12.2.1.2 with CentOS base system
 
-**Note:** Note configure domain, this is base image for playniuniu/centos-weblogic
+For production docker image, use [playniuniu/weblogic-domain](https://hub.docker.com/r/playniuniu/weblogic-domain/)
