@@ -19,13 +19,13 @@ COPY container-scripts/createAndStartEmptyDomain.sh container-scripts/create-wls
 
 RUN chmod 755 /u01 \
     && cd /u01 \
-    && curl -sSL ${ORACLE_WEBLOGIC12_URL} -o /u01/$FMW_PKG \
+    && curl -#SL ${ORACLE_WEBLOGIC12_URL} -o /u01/$FMW_PKG \
     && $JAVA_HOME/bin/jar xf /u01/$FMW_PKG \
     && useradd -b /u01 -M -s /bin/bash oracle \
     && echo oracle:oracle | chpasswd \
     && chown oracle:oracle -R /u01 \
-    && su - oracle -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -invPtrLoc /u01/oraInst.loc \
-    -jreLoc $JAVA_HOME -ignoreSysPrereqs -force -novalidation ORACLE_HOME=$ORACLE_HOME" \
+    && su - oracle -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -ignoreSysPrereqs -force -novalidation \
+    -invPtrLoc /u01/oraInst.loc -jreLoc $JAVA_HOME ORACLE_HOME=$ORACLE_HOME" \
     && rm /u01/$FMW_JAR /u01/$FMW_PKG /u01/oraInst.loc /u01/install.file \
     && chmod +rx $SCRIPT_FILE
 
