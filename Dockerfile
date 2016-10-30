@@ -19,8 +19,8 @@ COPY container-scripts/createAndStartEmptyDomain.sh container-scripts/create-wls
 
 RUN chmod 755 /u01 \
     && cd /u01 \
-    && curl -jk#SLH "Cookie: oraclelicense=accept-securebackup-cookie" ${ORACLE_WEBLOGIC12_URL} -O \
-    && $JAVA_HOME/bin/jar xf $FMW_PKG \
+    && curl -jksSLH "Cookie: oraclelicense=accept-securebackup-cookie" ${ORACLE_WEBLOGIC12_URL} -o /u01/$FMW_PKG \
+    && $JAVA_HOME/bin/jar xf /u01/$FMW_PKG \
     && useradd -b /u01 -M -s /bin/bash oracle \
     && echo oracle:oracle | chpasswd \
     && chown oracle:oracle -R /u01 \
