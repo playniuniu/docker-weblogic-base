@@ -14,16 +14,16 @@ ENV FMW_PKG=fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip \
     ADMIN_PORT="${ADMIN_PORT:-8001}" \
     PATH=$PATH:/usr/java/default/bin:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin
 
-COPY config/install.file config/oraInst.loc /u01/
+COPY weblogic-config/install.file weblogic-config/oraInst.loc /u01/
 COPY container-scripts/createAndStartEmptyDomain.sh container-scripts/create-wls-domain.py /u01/oracle/
 
-RUN chmod 755 /u01 \
-    && cd /u01 \
-    && curl -#SL ${ORACLE_WEBLOGIC12_URL} -o /u01/$FMW_PKG \
-    && $JAVA_HOME/bin/jar xf /u01/$FMW_PKG \
-    && useradd -b /u01 -M -s /bin/bash oracle \
+RUN useradd -b /u01 -M -s /bin/bash oracle \
     && echo oracle:oracle | chpasswd \
+    && cp /etc/skel/.bash* /u01/oracle/ \
+    && curl -#SL ${ORACLE_WEBLOGIC12_URL} -o /u01/$FMW_PKG \
     && chown oracle:oracle -R /u01 \
+    && cd /u01 \
+    && $JAVA_HOME/bin/jar xf /u01/$FMW_PKG \
     && su - oracle -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -ignoreSysPrereqs -force -novalidation \
     -invPtrLoc /u01/oraInst.loc -jreLoc $JAVA_HOME ORACLE_HOME=$ORACLE_HOME" \
     && rm /u01/$FMW_JAR /u01/$FMW_PKG /u01/oraInst.loc /u01/install.file \
