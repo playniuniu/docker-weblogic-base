@@ -1,34 +1,32 @@
-FROM playniuniu/centos-serverjre:8
-MAINTAINER playniuniu <playniuniu@gmail.com>
+FROM playniuniu/oracle-server-jre:8
+LABEL maintainer="playniuniu@gmail.com"
 
 ENV FMW_PKG=fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip \
     FMW_JAR=fmw_12.2.1.2.0_wls_quick.jar \
-    ORACLE_WEBLOGIC12_URL="http://blogcdn.uunus.cn/fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip" \
-    SCRIPT_FILE=/u01/oracle/createAndStartEmptyDomain.sh \
-    ORACLE_HOME=/u01/oracle \
+    WEBLOGIC_DOWNLOAD_LINK="https://storage.googleapis.com/weblogic/${FMW_PKG}" \
+    ORACLE_HOME=/home/oracle/weblogic/ \
+    DOMAIN_NAME=${DOMAIN_NAME:-base_domain} \
+    DOMAIN_HOME=/home/oracle/domains/${DOMAIN_NAME:-base_domain} \
     USER_MEM_ARGS="-Djava.security.egd=file:/dev/./urandom" \
-    DEBUG_FLAG=true \
-    PRODUCTION_MODE=dev \
-    DOMAIN_NAME="${DOMAIN_NAME:-base_domain}" \
-    DOMAIN_HOME=/u01/oracle/user_projects/domains/${DOMAIN_NAME:-base_domain} \
-    ADMIN_PORT="${ADMIN_PORT:-8001}" \
-    PATH=$PATH:/usr/java/default/bin:/u01/oracle/oracle_common/common/bin:/u01/oracle/wlserver/common/bin
+    ADMIN_PORT=8001 \
+    ADMIN_PASSWORD=welcome1 \
+    PATH=$PATH:/home/oracle/weblogic/oracle_common/common/bin
 
-COPY weblogic-config/install.file weblogic-config/oraInst.loc /u01/
-COPY container-scripts/createAndStartEmptyDomain.sh container-scripts/create-wls-domain.py /u01/oracle/
+COPY files/install.file files/oraInst.loc /tmp/
+COPY scripts/create-domain.py scripts/create-domain.sh /tmp/
 
-RUN useradd -b /u01 -M -s /bin/bash oracle \
+RUN useradd -m -s /bin/bash oracle \
     && echo oracle:oracle | chpasswd \
-    && cp /etc/skel/.bash* /u01/oracle/ \
-    && curl -#SL ${ORACLE_WEBLOGIC12_URL} -o /u01/$FMW_PKG \
-    && chown oracle:oracle -R /u01 \
-    && cd /u01 \
-    && $JAVA_HOME/bin/jar xf /u01/$FMW_PKG \
-    && su - oracle -c "$JAVA_HOME/bin/java -jar /u01/$FMW_JAR -ignoreSysPrereqs -force -novalidation \
-    -invPtrLoc /u01/oraInst.loc -jreLoc $JAVA_HOME ORACLE_HOME=$ORACLE_HOME" \
-    && rm /u01/$FMW_JAR /u01/$FMW_PKG /u01/oraInst.loc /u01/install.file \
-    && chmod +rx $SCRIPT_FILE
+    && curl -#SL ${WEBLOGIC_DOWNLOAD_LINK} -o /tmp/$FMW_PKG \
+    && cd /tmp \
+    && $JAVA_HOME/bin/jar xf /tmp/$FMW_PKG \
+    && su - oracle -c "mkdir /home/oracle/bin/" \
+    && su - oracle -c "$JAVA_HOME/bin/java -jar /tmp/$FMW_JAR -ignoreSysPrereqs -force -novalidation \
+    -invPtrLoc /tmp/oraInst.loc -jreLoc $JAVA_HOME ORACLE_HOME=${ORACLE_HOME}" \
+    && mv /tmp/create-domain.py /tmp/create-domain.sh /home/oracle/bin/ \
+    && rm -rf /tmp/*
 
-WORKDIR ${ORACLE_HOME}
-
-CMD ["/u01/oracle/createAndStartEmptyDomain.sh"]
+EXPOSE ${ADMIN_PORT}
+USER oracle
+WORKDIR /home/oracle
+CMD ["/home/oracle/bin/create-domain.sh"]
