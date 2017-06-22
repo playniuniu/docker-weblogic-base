@@ -8,12 +8,11 @@ ENV FMW_PKG=fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip \
     DOMAIN_NAME=${DOMAIN_NAME:-base_domain} \
     DOMAIN_HOME=/home/oracle/domains/${DOMAIN_NAME:-base_domain} \
     USER_MEM_ARGS="-Djava.security.egd=file:/dev/./urandom" \
-    ADMIN_PORT=8001 \
     ADMIN_PASSWORD=welcome1 \
-    PATH=$PATH:/home/oracle/weblogic/oracle_common/common/bin
+    PATH=$PATH:/home/oracle/bin:/home/oracle/weblogic/oracle_common/common/bin
 
-COPY files/install.file files/oraInst.loc /tmp/
-COPY scripts/create-domain.py scripts/create-domain.sh /tmp/
+COPY files/* /tmp/
+COPY scripts/* /tmp/
 
 RUN useradd -m -s /bin/bash oracle \
     && echo oracle:oracle | chpasswd \
@@ -26,7 +25,6 @@ RUN useradd -m -s /bin/bash oracle \
     && mv /tmp/create-domain.py /tmp/create-domain.sh /home/oracle/bin/ \
     && rm -rf /tmp/*
 
-EXPOSE ${ADMIN_PORT}
 USER oracle
 WORKDIR /home/oracle
 CMD ["/home/oracle/bin/create-domain.sh"]
