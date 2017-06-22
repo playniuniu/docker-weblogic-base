@@ -3,7 +3,7 @@ LABEL maintainer="playniuniu@gmail.com"
 
 ENV FMW_PKG=fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip \
     FMW_JAR=fmw_12.2.1.2.0_wls_quick.jar \
-    WEBLOGIC_DOWNLOAD_LINK="https://storage.googleapis.com/weblogic/${FMW_PKG}" \
+    WEBLOGIC_DOWNLOAD_LINK="https://storage.googleapis.com/weblogic/fmw_12.2.1.2.0_wls_quick_Disk1_1of1.zip" \
     ORACLE_HOME=/home/oracle/weblogic/ \
     DOMAIN_NAME=${DOMAIN_NAME:-base_domain} \
     DOMAIN_HOME=/home/oracle/domains/${DOMAIN_NAME:-base_domain} \
